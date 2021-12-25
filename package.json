@@ -1,6 +1,6 @@
 {
   "name": "redux-toolkit-easy",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "Kim-kijun",
     "email": "kijun3807@gmail.com"
@@ -42,5 +42,10 @@
     "ts-node": "^10.4.0",
     "typescript": "^4.2.4"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kim-kijun/redux-toolkit-easy"
+  },
+  "homepage": "https://github.com/kim-kijun/redux-toolkit-easy"
 }
