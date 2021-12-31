@@ -1,6 +1,6 @@
 import { should } from 'chai';
 import { configureStore } from '@reduxjs/toolkit';
-import { createSliceWithSetter } from '../../src/index';
+import { createSliceEasy } from '../../src/index';
 
 const initialState = {
   boolean: false,
@@ -8,7 +8,7 @@ const initialState = {
   string: '',
 };
 
-const { reducer, actions } = createSliceWithSetter('slice', initialState);
+const { reducer, actions } = createSliceEasy('slice', initialState);
 
 const store = configureStore({
   reducer,
@@ -17,7 +17,7 @@ const store = configureStore({
 });
 const dispatch = store.dispatch;
 
-describe('[create-slice-with-setter] primitive-type-test', () => {
+describe('[create-slice-easy] primitive-type-test', () => {
   it('1. boolean', () => {
     should().equal(store.getState().boolean, false);
     dispatch(actions.setBoolean(true));

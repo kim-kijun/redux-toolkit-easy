@@ -14,82 +14,153 @@ or
 yarn add redux-toolkit-easy
 ```
 
-# The code before and after using `redux-toolkit-easy`
+# Usage
 
-## [`Before`] Create slice and actions(original redux-toolkit)
+## `createSliceEasy`
+
+Create new redux-toolkit slice with basic actions.
+
+## example - basic
 
 ```typescript
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSliceEasy } from 'redux-toolkit-easy';
+import { configureStore } from '@reduxjs/toolkit';
 
 const initialState = {
-  name: 'Alex',
-  age: 32,
-  hobbies: ['drum', 'swimming'],
-  cat: {
-    name: 'koon',
-    age: 7,
-  },
+  isSigned: false,
+  count: 1,
 };
 
-const { reducer, actions } = createSlice({
-  name: 'user',
-  initialState,
-  reducers: {
-    setName(state, action: PayloadAction<string>) {
-      state.name = action.payload;
-    },
-    setAge(state, action: PayloadAction<number>) {
-      state.age = action.payload;
-    },
-    setHobbies(state, action: PayloadAction<string[]>) {
-      state.hobbies = action.payload;
-    },
-    setCatName(state, action: PayloadAction<string>) {
-      state.cat.name = action.payload;
-    },
-    setCatAge(state, action: PayloadAction<number>) {
-      state.cat.age = action.payload;
-    },
-    addHobbies(state, action: PayloadAction<string>) {
-      state.hobbies.push(action.payload);
-    },
-  },
-});
+const { actions, reducer } = createSliceEasy('my-slice', initialState);
+const store = configureStore({ reducer });
+const dispatch = store.dispatch;
 
-// dispatch actions
-dispatch(actions.setName('kijun'));
-dispatch(actions.setAge(33));
-dispatch(actions.setHobbies(['writing', 'drawing']));
-dispatch(actions.setCatName('zingga'));
-dispatch(actions.setCatAge(10));
-dispatch(actions.addHobbies('baseball'));
+/* You can use predefined actions. */
+const { setCount, setIsSigned, initCount, initIsSigned, setState } = actions;
+
+dispatch(setIsSigned(true));
+// isSigned === true
+
+dispatch(setCount(3));
+// count === 3
+
+/* You can also use action with previous state. */
+dispatch(setCount((prevState) => prevState + 2));
+// count === 5
+
+/* Initialize to initial value. */
+dispatch(initCount());
+// count === 1
 ```
 
-## [`After`] Create slice and actions(with redux-tookit-easy)
+## example - custom, immer
+
+You can define original slice reducers in redux-tookit.
+
+https://redux-toolkit.js.org/api/createSlice#reducers
+
+`createSliceEasy` use also the `immer` as you used in the redux-toolkit.
+
+https://redux-toolkit.js.org/usage/immer-reducers
 
 ```typescript
-import { createSliceWithSetter } from 'redux-toolkit-easy';
+import { createSliceEasy } from 'redux-toolkit-easy';
+import { configureStore } from '@reduxjs/toolkit';
 
-const { reducer, actions } = createSliceWithSetter('user', initialState, {
-  addHobbies(state, action: PayloadAction<string>) {
-    state.hobbies.push(action.payload);
+const initialState = {
+  user: {
+    name: 'Alex',
+    age: 32,
+  },
+  hobbies: ['drum'],
+};
+
+const { actions, reducer } = createSliceEasy('my-slice', initialState, {
+  /* You can define custom redux-tookit slice reducer */
+  toUppercaseUserName(state) {
+    state.user.name = state.user.name.toUpperCase();
   },
 });
+const store = configureStore({ reducer });
+const dispatch = store.dispatch;
 
-// dispatch actions
-dispatch(actions.setName('kijun'));
-dispatch(actions.setAge(33));
-dispatch(actions.setHobbies(['writing', 'drawing']));
-dispatch(actions.setCat((cat) => (cat.name = 'zingga')));
-dispatch(actions.setCat((cat) => (cat.age = 10)));
-dispatch(actions.addHobbies('baseball'));
+const {
+  // predefined actions of createSliceEasy
+  setUser,
+  setHobbies,
+  initUser,
+  initHobbies,
+  setState,
+
+  // custom reducer action
+  toUppercaseUserName,
+} = actions;
+
+dispatch(toUppercaseUserName());
+
+/* actions with immer */
+dispatch(
+  setUser((user) => {
+    user.name = 'Kijun';
+  }),
+);
+dispatch(
+  setState((prevState) => {
+    prevState.user.age = 33;
+  }),
+);
+dispatch(
+  setHobbies((hobbies) => {
+    hobbies.push('writing');
+  }),
+);
 ```
 
-# Description
+## example - Array actions
 
-The function `createSliceWithSetter` makes a slice with setter actions. You don't need make simple actions like setAge(), setLoading(), setStage()..., also you can put the payload to function.
+`createSliceEasy` provides more actions for array type states.
 
-And support typescript.
+```typescript
+import { createSliceEasy } from 'redux-toolkit-easy';
+import { configureStore } from '@reduxjs/toolkit';
+
+const { actions, reducer } = createSliceEasy('my-slice', {
+  hobbies: ['drum', 'singing'],
+});
+const store = configureStore({ reducer });
+const dispatch = store.dispatch;
+const {
+  setHobbies,
+  initHobbies,
+  setState,
+  /* createSliceEasy provides actions
+     related to array type. */
+  pushHobbies,
+  popHobbies,
+  shiftHobbies,
+  unshiftHobbies,
+  deleteHobbies,
+} = actions;
+
+dispatch(pushHobbies('writing'));
+// ['drum', 'singing', 'writing']
+
+dispatch(unshiftHobbies('piano'));
+// ['piano', 'drum', 'singing', 'writing']
+
+dispatch(deleteHobbies(2));
+// ['piano', 'drum', 'writing']
+
+dispatch(deleteHobbies((hobby) => hobby === 'drum'));
+// ['piano', 'writing']
+
+dispatch(popHobbies());
+// ['piano']
+```
+
+## Typescript
+
+`createSliceEasy` support actions with typescript.
 
 # Peer Dependency
 

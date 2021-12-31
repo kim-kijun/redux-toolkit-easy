@@ -5,11 +5,10 @@ import {
   SliceCaseReducers,
   ValidateSliceCaseReducers,
 } from '@reduxjs/toolkit';
+import { ReducersManager } from './reducers-manager';
+import type { CreateSliceEasyActionTypes, SetStateAction } from './types';
 
-type SetterName<Name extends string = string> = `set${Capitalize<Name>}`;
-type SetStateAction<T> = (state: T) => void;
-
-export const createSliceWithSetter = <
+export function createSliceEasy<
   State extends {},
   CaseReducers extends SliceCaseReducers<State> = SliceCaseReducers<State>,
   Name extends string = string,
@@ -17,21 +16,11 @@ export const createSliceWithSetter = <
   name: Name,
   initialState: State,
   reducers: ValidateSliceCaseReducers<State, CaseReducers> = {} as any,
-) => {
+) {
   if (typeof initialState === 'object') {
-    Object.keys(initialState).forEach((key) => {
-      const capitalizeKey = key.charAt(0).toUpperCase() + key.slice(1);
-      const setter = 'set' + capitalizeKey;
-      if (!(reducers as any)[setter]) {
-        (reducers as any)[setter] = (state: any, { payload }: any) => {
-          if (typeof payload === 'function') {
-            payload(state[key]);
-          } else {
-            state[key] = payload;
-          }
-        };
-      }
-    });
+    new ReducersManager(initialState, reducers).addReducers();
+  } else {
+    throw new Error('Only support the object type');
   }
 
   const slice = createSlice({
@@ -51,10 +40,6 @@ export const createSliceWithSetter = <
   return slice as typeof slice & {
     actions: typeof slice.actions &
       CaseReducerActions<CaseReducers> &
-      {
-        [K in keyof State as SetterName<string & K>]: (
-          payload: State[K] | SetStateAction<State[K]>,
-        ) => PayloadAction<any>;
-      };
+      CreateSliceEasyActionTypes<State>;
   };
-};
+}

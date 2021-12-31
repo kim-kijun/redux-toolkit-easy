@@ -1,6 +1,6 @@
 import { should } from 'chai';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { createSliceWithSetter } from '../../src/index';
+import { createSliceEasy } from '../../src/index';
 
 const initialStateA = {
   user: {
@@ -15,12 +15,12 @@ const initialStateB = {
   data: [] as string[] | null,
 };
 
-const { reducer: reducerA, actions: actionA } = createSliceWithSetter(
+const { reducer: reducerA, actions: actionA } = createSliceEasy(
   'sliceA',
   initialStateA,
 );
 
-const { reducer: reducerB, actions: actionB } = createSliceWithSetter(
+const { reducer: reducerB, actions: actionB } = createSliceEasy(
   'sliceB',
   initialStateB,
 );
@@ -35,10 +35,14 @@ const store = configureStore({
 });
 const dispatch = store.dispatch;
 
-describe('[create-slice-with-setter] object-type-test', () => {
+describe('[create-slice-easy] object-type-test', () => {
   it('1. combine', () => {
     should().equal(store.getState().a, initialStateA);
-    dispatch(actionA.setUser((user) => (user.name = 'Kim-kijun')));
+    dispatch(
+      actionA.setUser((user) => {
+        user.name = 'Kim-kijun';
+      }),
+    );
     dispatch(actionB.setScore(12));
     should().equal(store.getState().a.user.name, 'Kim-kijun');
     should().equal(store.getState().b.score, 12);
@@ -60,7 +64,11 @@ describe('[create-slice-with-setter] object-type-test', () => {
     should().equal(store.getState().b.score, undefined);
     dispatch(actionB.setScore(45));
     should().equal(store.getState().b.score, 45);
-    dispatch(actionB.setData((state) => state?.push('abcd')));
+    dispatch(
+      actionB.setData((state) => {
+        state?.push('abcd');
+      }),
+    );
     should().equal(JSON.stringify(store.getState().b.data), '["abcd"]');
     dispatch(actionB.setData(null));
     should().equal(store.getState().b.data, null);

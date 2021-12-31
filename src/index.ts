@@ -1,1 +1,1 @@
-export * from './create-slice-with-setter';
+export * from './create-slice-easy';
