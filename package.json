@@ -1,6 +1,6 @@
 {
   "name": "redux-toolkit-easy",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "author": {
     "name": "Kim-kijun",
     "email": "kijun3807@gmail.com"
@@ -21,7 +21,7 @@
     "dist"
   ],
   "scripts": {
-    "dev": "mocha test/**/*.ts -r ts-node/register --watch --watch-files src,test",
+    "dev": "mocha test/**/*.ts -r ts-node/register --watch --watch-files src/**/*,test/**/*",
     "test": "mocha test/**/*.ts -r ts-node/register",
     "build": "rm -rf dist && yarn lint && yarn format && yarn test && node ./scripts/build.js && yarn build:type",
     "build:type": "tsc",
